@@ -32,5 +32,19 @@
     }
   ],
   "refactoring": [],
-  "research": []
+  "research": [],
+  "daily_news": [
+    {
+      "id": "03de22df",
+      "timestamp": "2025-11-14T15:21:09.216305",
+      "crew_type": "daily_news",
+      "input_files": [
+        "主題: Artificial Intelligence, Machine Learning, Deep Learning, Large Language Models (LLM), Generative AI, ChatGPT/GPT Models, Computer Vision, Natural Language Processing, AI Agents, Neural Networks, Transformer Models (5 篇)"
+      ],
+      "output_file": "TECH_NEWS_20251114.md",
+      "success": true,
+      "error_message": null,
+      "file_exists": true
+    }
+  ]
 }

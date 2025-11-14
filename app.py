@@ -5,6 +5,7 @@ CrewAI Code Agent - Streamlit Web UI
 
 import os
 import sys
+from datetime import datetime
 
 # 🔇 停用 CrewAI 遙測，避免連線錯誤訊息
 os.environ['OTEL_SDK_DISABLED'] = 'true'
@@ -12,6 +13,9 @@ os.environ['OTEL_SDK_DISABLED'] = 'true'
 import streamlit as st
 from streamlit_option_menu import option_menu
 from pathlib import Path
+
+# 🔐 導入認證模組
+from auth_manager import require_authentication, show_user_info
 
 # 設定頁面配置
 st.set_page_config(
@@ -118,9 +122,9 @@ def show_home():
     st.markdown("---")
     
     # 功能介紹
-    st.markdown('<div class="sub-header">🎯 三大核心功能</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">🎯 四大核心功能</div>', unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
@@ -132,10 +136,19 @@ def show_home():
         - 📊 架構說明
         - 💡 使用範例
         
-        **適合用於：**
-        - 為舊專案補文檔
-        - 理解複雜代碼
-        - API 文檔生成
+        **適合：** 補文檔、理解代碼、API 文檔
+        """)
+        
+        st.markdown("""
+        ### 🔍 Tech Researcher
+        **技術調研助手**
+        
+        - 🌐 網路資訊搜尋
+        - ⚖️ 優劣勢比較
+        - 🎯 決策建議
+        - 📊 實施路線圖
+        
+        **適合：** 技術選型、學習新技術、工具評估
         """)
     
     with col2:
@@ -148,26 +161,24 @@ def show_home():
         - ♻️ 重構建議
         - ✨ 優化後代碼
         
-        **適合用於：**
-        - Code Review 自動化
-        - 發現安全問題
-        - Legacy Code 重構
+        **適合：** Code Review、安全檢查、重構
         """)
-    
-    with col3:
+        
         st.markdown("""
-        ### 🔍 Tech Researcher
-        **技術調研助手**
+        ### 📰 每日技術新聞 ✨NEW
+        **自動新聞摘要**
         
-        - 🌐 網路資訊搜尋
-        - ⚖️ 優劣勢比較
-        - 🎯 決策建議
-        - 📊 實施路線圖
+        - 🔍 搜尋最新 AI 技術文章（不重複）
+        - 📖 深度內容分析與摘要
+        - ⭐ 智能評分推薦
+        - 📝 結構化每日報告
         
-        **適合用於：**
-        - 技術選型決策
-        - 學習新技術
-        - 工具評估
+        **AI Agents**：
+        - 🕵️ Tech News Hunter - 搜尋最新技術文章
+        - 📊 Content Analyzer - 深度分析與摘要
+        - ✍️ Report Writer - 生成每日報告
+        
+        **適合：** 追蹤 AI 趨勢、持續學習
         """)
     
     st.markdown("---")
@@ -986,6 +997,212 @@ def show_tech_researcher():
                 st.error(f"❌ 執行錯誤：{str(e)}")
                 st.exception(e)
 
+# 每日技術新聞頁面
+def show_daily_tech_news():
+    st.markdown('<div class="main-header">📰 每日 AI 技術新聞</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">自動搜尋並分析最新 AI/ML 技術文章</div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="info-box">
+        <h4>🎯 功能說明</h4>
+        <p>AI Agents 會自動搜尋最新的 AI/ML 技術文章，並進行深度分析：</p>
+        <ul>
+            <li>🔍 搜尋最新 AI 技術文章（自動排除已讀過的文章）</li>
+            <li>📖 閱讀並深度分析文章內容（每篇 200-300 字摘要）</li>
+            <li>📝 生成結構化的每日摘要報告</li>
+            <li>⭐ 評分並推薦最值得閱讀的文章</li>
+        </ul>
+        <p><strong>🤖 AI Agents 團隊：</strong></p>
+        <ul>
+            <li>🕵️ <strong>AI News Hunter</strong> - 從多個來源搜尋最新 AI 文章</li>
+            <li>📊 <strong>AI Content Analyzer</strong> - 深度閱讀並撰寫詳細摘要</li>
+            <li>✍️ <strong>AI News Report Writer</strong> - 整理成易讀的每日報告</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # 初始化 history manager
+    from crew_modules.history_manager import history_manager
+    
+    # 歷史記錄區塊
+    with st.expander("📚 查看歷史記錄", expanded=False):
+        history = history_manager.get_history('daily_news', limit=20)
+        
+        if history:
+            st.write(f"**總共 {len(history)} 筆記錄**")
+            
+            for record in history:
+                col1, col2, col3 = st.columns([3, 2, 1])
+                
+                with col1:
+                    topics_str = record.get('input_files', ['未指定'])[0] if record.get('input_files') else '未指定'
+                    st.write(f"🗓️ **{record.get('timestamp', 'N/A')}**")
+                    st.write(f"📋 主題：{topics_str}")
+                
+                with col2:
+                    output_file = record.get('output_file', '')
+                    if output_file and os.path.exists(output_file):
+                        with open(output_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        st.download_button(
+                            label="📥 下載報告",
+                            data=content,
+                            file_name=output_file,
+                            mime="text/markdown",
+                            key=f"download_news_{record.get('id')}"
+                        )
+                
+                with col3:
+                    if st.button("🗑️ 刪除", key=f"delete_news_{record.get('id')}"):
+                        history_manager.delete_record(record['id'])
+                        st.rerun()
+                
+                st.markdown("---")
+        else:
+            st.info("📭 尚無歷史記錄")
+    
+    st.markdown("---")
+    
+    # 設定區域
+    st.markdown("### ⚙️ 搜尋設定")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        num_articles = st.slider(
+            "📊 文章數量",
+            min_value=5,
+            max_value=10,
+            value=7,
+            help="建議 5-10 篇，以確保內容質量和閱讀時間"
+        )
+    
+    with col2:
+        # 顯示已讀文章統計
+        try:
+            from crew_modules.daily_tech_news_module import load_read_articles
+            history_data = load_read_articles()
+            read_count = len(history_data.get('articles', []))
+            st.metric("📚 已讀文章", f"{read_count} 篇")
+        except:
+            st.metric("📚 已讀文章", "0 篇")
+    
+    # 主題選擇
+    st.markdown("### 🎯 AI 相關主題（預設已選）")
+    
+    st.info("💡 系統將自動搜尋 AI、Machine Learning、LLM、Generative AI 等相關主題的最新文章")
+    
+    # 顯示預設主題
+    default_topics = [
+        "Artificial Intelligence", "Machine Learning", "Deep Learning",
+        "Large Language Models (LLM)", "Generative AI", "ChatGPT/GPT Models",
+        "Computer Vision", "Natural Language Processing",
+        "AI Agents", "Neural Networks", "Transformer Models"
+    ]
+    
+    with st.expander("📋 查看完整搜尋主題列表", expanded=False):
+        for i, topic in enumerate(default_topics, 1):
+            st.write(f"{i}. {topic}")
+    
+    # 使用預設 AI 主題
+    all_topics = default_topics
+    
+    # 進階選項
+    with st.expander("🔧 進階選項", expanded=False):
+        clear_history = st.checkbox(
+            "🗑️ 清除已讀文章記錄（重新搜尋所有文章）",
+            value=False,
+            help="勾選後將清除已讀記錄，下次執行時會重新搜尋所有文章（可能出現重複）"
+        )
+        
+        if clear_history and st.button("⚠️ 確認清除已讀記錄"):
+            try:
+                from crew_modules.daily_tech_news_module import save_read_articles
+                save_read_articles({"articles": []})
+                st.success("✅ 已清除已讀文章記錄")
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ 清除失敗：{str(e)}")
+    
+    # 執行按鈕
+    st.markdown("---")
+    
+    if st.button("🚀 開始搜尋 AI 技術新聞", type="primary"):
+        # 創建進度顯示容器
+        progress_container = st.empty()
+        
+        # 定義進度回調函數
+        def update_progress(agent_name, status, total_agents, completed_agents):
+            with progress_container:
+                if status == "running":
+                    st.progress(completed_agents / total_agents, f"🔄 {agent_name} 正在執行...")
+                elif status == "completed":
+                    st.progress(completed_agents / total_agents, f"✅ {agent_name} 已完成 ({completed_agents}/{total_agents})")
+        
+        with st.spinner("🤖 AI Agents 正在搜尋和分析 AI 文章... 這可能需要 2-5 分鐘"):
+            try:
+                # 動態導入
+                from crew_modules import daily_tech_news_module
+                
+                # 生成輸出文件名
+                today = datetime.now().strftime("%Y%m%d")
+                output_file = f"TECH_NEWS_{today}.md"
+                
+                # 執行 Crew
+                result = daily_tech_news_module.run_daily_tech_news(
+                    topics=all_topics,
+                    num_articles=num_articles,
+                    output_file=output_file,
+                    progress_callback=update_progress
+                )
+                
+                # 記錄到歷史
+                history_manager.add_record(
+                    crew_type='daily_news',
+                    input_files=[f"主題: {', '.join(all_topics)} ({num_articles} 篇)"],
+                    output_file=output_file,
+                    success=True
+                )
+                
+                st.markdown('<div class="success-box">', unsafe_allow_html=True)
+                st.markdown("### ✅ AI 技術新聞搜尋完成！")
+                st.markdown(f"**文章數量**：{num_articles} 篇")
+                st.markdown(f"**涵蓋領域**：AI、Machine Learning、LLM、Generative AI 等")
+                st.markdown(f"**輸出報告**：`{output_file}`")
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                # 顯示結果
+                if os.path.exists(output_file):
+                    with open(output_file, 'r', encoding='utf-8') as f:
+                        report_content = f.read()
+                    
+                    st.markdown("### 📊 每日 AI 新聞摘要")
+                    st.markdown(report_content)  # 直接用 markdown 渲染，不會顯示 # 符號
+                    
+                    # 下載按鈕
+                    st.download_button(
+                        label="📥 下載完整報告",
+                        data=report_content,
+                        file_name=output_file,
+                        mime="text/markdown",
+                        key="download_daily_news"
+                    )
+                
+            except Exception as e:
+                # 記錄錯誤到歷史
+                history_manager.add_record(
+                    crew_type='daily_news',
+                    input_files=[f"主題: {', '.join(all_topics)} ({num_articles} 篇)"],
+                    output_file=output_file if 'output_file' in locals() else None,
+                    success=False,
+                    error_message=str(e)
+                )
+                
+                st.error(f"❌ 執行錯誤：{str(e)}")
+                st.exception(e)
+
 # System Prompts 設定頁面
 def show_system_prompts():
     st.markdown('<div class="main-header">💬 System Prompts 設定</div>', unsafe_allow_html=True)
@@ -1232,6 +1449,10 @@ def show_settings():
 
 # 主程式
 def main():
+    # 🔐 要求身份驗證
+    if not require_authentication():
+        return
+    
     # 側邊欄選單
     with st.sidebar:
         st.markdown("### 🤖 CrewAI Code Agent")
@@ -1239,8 +1460,8 @@ def main():
         
         selected = option_menu(
             menu_title=None,
-            options=["首頁", "Documentation Crew", "Refactoring Crew", "Tech Researcher", "System Prompts", "設定"],
-            icons=["house", "book", "tools", "search", "chat-dots", "gear"],
+            options=["首頁", "Documentation Crew", "Refactoring Crew", "Tech Researcher", "每日技術新聞", "System Prompts", "設定"],
+            icons=["house", "book", "tools", "search", "newspaper", "chat-dots", "gear"],
             menu_icon="cast",
             default_index=0,
         )
@@ -1252,6 +1473,10 @@ def main():
             © 2025 Andy Hsieh
         </div>
         """, unsafe_allow_html=True)
+        
+        # 顯示用戶資訊和登出按鈕（放在最底部）
+        show_user_info()
+
     
     # 根據選擇顯示對應頁面
     if selected == "首頁":
@@ -1262,6 +1487,8 @@ def main():
         show_refactoring_crew()
     elif selected == "Tech Researcher":
         show_tech_researcher()
+    elif selected == "每日技術新聞":
+        show_daily_tech_news()
     elif selected == "System Prompts":
         show_system_prompts()
     elif selected == "設定":
