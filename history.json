@@ -1,0 +1,36 @@
+{
+  "documentation": [
+    {
+      "id": "ab4ee008",
+      "timestamp": "2025-11-14T14:27:48.093531",
+      "crew_type": "documentation",
+      "input_files": [
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\base.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\factory.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\providers.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\__init__.py"
+      ],
+      "output_file": "DOCS_MultiFile_4files.md",
+      "success": true,
+      "error_message": null,
+      "file_exists": true
+    },
+    {
+      "id": "2eaa4311",
+      "timestamp": "2025-11-14T13:45:03.675033",
+      "crew_type": "documentation",
+      "input_files": [
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\base.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\factory.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\providers.py",
+        "C:/Users/Andy3_Hsieh/Desktop/ASUS_Project/Code/npspo_llm_wrapper/vectorstore_wrapper\\__init__.py"
+      ],
+      "output_file": "DOCS_MultiFile_4files.md",
+      "success": true,
+      "error_message": null,
+      "file_exists": true
+    }
+  ],
+  "refactoring": [],
+  "research": []
+}
